@@ -54,15 +54,10 @@ func ConfigureScanner(reader io.Reader, config Config) *Scanner {
 	csvReader.LazyQuotes = config.LazyQuotes
 	csvReader.TrimLeadingSpace = config.TrimLeadingSpace
 	csvReader.ReuseRecord = config.ReuseRecord
-	scanner := NewScannerFromReader(csvReader)
-	scanner.continueOnError = config.ContinueOnError
-	return scanner
-}
-
-// NewScannerOverReader simply wraps a pre-configured *csv.Reader
-// with a *Scanner, ready for action.
-func NewScannerFromReader(reader *csv.Reader) *Scanner {
-	return &Scanner{reader: reader}
+	return &Scanner{
+		reader:          csvReader,
+		continueOnError: config.ContinueOnError,
+	}
 }
 
 // Scan advances the Scanner to the next record, which will then be available
