@@ -15,17 +15,11 @@ func TestScanAllFixture(t *testing.T) {
 
 type ScanAllFixture struct {
 	*gunit.Fixture
-
-	config *Config
 }
 
-func (this *ScanAllFixture) Setup() {
-	this.config = new(Config)
-}
-
-func (this *ScanAllFixture) scanAll(inputs []string, config Config) (scanned []Record) {
+func (this *ScanAllFixture) scanAll(inputs []string, options ...option) (scanned []Record) {
 	reader := strings.NewReader(strings.Join(inputs, "\n"))
-	scanner := ConfigureScanner(reader, config)
+	scanner := NewScanner(reader, options...)
 	line := 1
 	for ; scanner.Scan(); line++ {
 		scanned = append(scanned, Record{
@@ -44,17 +38,17 @@ func (this *ScanAllFixture) scanAll(inputs []string, config Config) (scanned []R
 }
 
 func (this *ScanAllFixture) TestCanonical() {
-	this.So(this.scanAll(csvCanon, Config{}), should.Resemble, expectedScannedOutput)
+	scanned := this.scanAll(csvCanon, Comma(','), FieldsPerRecord(3))
+	this.So(scanned, should.Resemble, expectedScannedOutput)
 }
 
 func (this *ScanAllFixture) TestCanonicalWithOptions() {
-	config := Config{Comma: ';', Comment: '#'}
-	scanned := this.scanAll(csvCanonRequiringConfigOptions, config)
+	scanned := this.scanAll(csvCanonRequiringConfigOptions, Comma(';'), Comment('#'))
 	this.So(scanned, should.Resemble, expectedScannedOutput)
 }
 
 func (this *ScanAllFixture) TestInconsistentFieldCounts_ContinueOnError() {
-	scanned := this.scanAll(csvCanonInconsistentFieldCounts, Config{ContinueOnError: true})
+	scanned := this.scanAll(csvCanonInconsistentFieldCounts, ContinueOnError)
 	this.So(scanned, should.Resemble, []Record{
 		{line: 1, record: []string{"1", "2", "3"}, err: nil},
 		{line: 2, record: []string{"1", "2", "3", "4"}, err: &csv.ParseError{Line: 2, Column: 0, Err: csv.ErrFieldCount}},
@@ -63,7 +57,7 @@ func (this *ScanAllFixture) TestInconsistentFieldCounts_ContinueOnError() {
 }
 
 func (this *ScanAllFixture) TestInconsistentFieldCounts_HaltOnError() {
-	scanned := this.scanAll(csvCanonInconsistentFieldCounts, Config{ContinueOnError: false})
+	scanned := this.scanAll(csvCanonInconsistentFieldCounts)
 	this.So(scanned, should.Resemble, []Record{
 		{line: 1, record: []string{"1", "2", "3"}, err: nil},
 		{line: 2, record: nil, err: &csv.ParseError{Line: 2, Column: 0, Err: csv.ErrFieldCount}},
@@ -71,7 +65,7 @@ func (this *ScanAllFixture) TestInconsistentFieldCounts_HaltOnError() {
 }
 
 func (this *ScanAllFixture) TestCallsToScanAfterEOFReturnFalse() {
-	scanner := NewScanner(strings.NewReader("1,2,3"), ',')
+	scanner := NewScanner(strings.NewReader("1,2,3"), Comma(','))
 
 	this.So(scanner.Scan(), should.BeTrue)
 	this.So(scanner.Record(), should.Resemble, []string{"1", "2", "3"})
