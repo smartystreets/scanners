@@ -5,17 +5,11 @@ import (
 	"io"
 )
 
-// Config allows customization of Scanner behavior.
-// The first block of fields mirrors those found on csv.Reader.
-// https://golang.org/pkg/encoding/csv/#Reader
-type Config struct {
-	// Comma defaults to ','.
-	Comma            rune
-	Comment          rune
-	FieldsPerRecord  int
-	LazyQuotes       bool
-	TrimLeadingSpace bool
-	ReuseRecord      bool
+// Scanner wraps a csv.Reader via an API similar to that of bufio.Scanner.
+type Scanner struct {
+	reader *csv.Reader
+	record []string
+	err    error
 
 	// ContinueOnError controls scanner behavior in error scenarios.
 	// If true, continue scanning until io.EOF is reached.
@@ -25,39 +19,24 @@ type Config struct {
 	// See https://golang.org/pkg/encoding/csv/#pkg-variables
 	// and https://golang.org/pkg/encoding/csv/#ParseError
 	// for more information regarding possible error values.
-	ContinueOnError bool
-}
-
-// Scanner wraps a csv.Reader via an API similar to that of bufio.Scanner.
-type Scanner struct {
-	reader *csv.Reader
-	record []string
-	err    error
-
 	continueOnError bool
 }
 
 // NewScanner returns a scanner configured with the provided separator (comma).
-func NewScanner(reader io.Reader, comma rune) *Scanner {
-	return ConfigureScanner(reader, Config{Comma: comma})
+func NewScanner(reader io.Reader, options ...option) *Scanner {
+	return new(Scanner).initialize(reader).configure(options)
 }
 
-// ConfigureScanner builds a *csv.Reader from the provided io.Reader and Config
-// and wraps it in a *Scanner, ready for action.
-func ConfigureScanner(reader io.Reader, config Config) *Scanner {
-	csvReader := csv.NewReader(reader)
-	if config.Comma != 0 {
-		csvReader.Comma = config.Comma
+func (this *Scanner) initialize(reader io.Reader) *Scanner {
+	this.reader = csv.NewReader(reader)
+	return this
+}
+
+func (this *Scanner) configure(options []option) *Scanner {
+	for _, configure := range options {
+		configure(this)
 	}
-	csvReader.Comment = config.Comment
-	csvReader.FieldsPerRecord = config.FieldsPerRecord
-	csvReader.LazyQuotes = config.LazyQuotes
-	csvReader.TrimLeadingSpace = config.TrimLeadingSpace
-	csvReader.ReuseRecord = config.ReuseRecord
-	return &Scanner{
-		reader:          csvReader,
-		continueOnError: config.ContinueOnError,
-	}
+	return this
 }
 
 // Scan advances the Scanner to the next record, which will then be available
