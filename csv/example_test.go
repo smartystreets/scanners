@@ -8,10 +8,6 @@ import (
 	"github.com/smartystreets/scanners/csv"
 )
 
-func init() {
-	log.SetFlags(log.Lshortfile)
-}
-
 func ExampleScanner() {
 	in := strings.Join([]string{
 		`first_name,last_name,username`,
@@ -26,7 +22,7 @@ func ExampleScanner() {
 	}
 
 	if err := scanner.Error(); err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	// Output:
@@ -54,7 +50,7 @@ func ExampleScannerOptions() {
 	}
 
 	if err := scanner.Error(); err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	// Output:
