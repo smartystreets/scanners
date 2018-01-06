@@ -34,7 +34,7 @@ func ExampleScanner() {
 
 // This example shows how csv.Scanner can be configured to handle other
 // types of CSV files.
-func ExampleScannerOptions() {
+func ExampleScanner_options() {
 	in := strings.Join([]string{
 		`first_name;last_name;username`,
 		`"Rob";"Pike";rob`,
