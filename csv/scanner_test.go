@@ -2,6 +2,7 @@ package csv
 
 import (
 	"encoding/csv"
+	"io"
 	"strings"
 	"testing"
 
@@ -18,8 +19,7 @@ type ScanAllFixture struct {
 }
 
 func (this *ScanAllFixture) scanAll(inputs []string, options ...Option) (scanned []Record) {
-	reader := strings.NewReader(strings.Join(inputs, "\n"))
-	scanner := NewScanner(reader, options...)
+	scanner := NewScanner(reader(inputs), options...)
 	line := 1
 	for ; scanner.Scan(); line++ {
 		scanned = append(scanned, Record{
@@ -83,6 +83,10 @@ func (this *ScanAllFixture) TestCallsToScanAfterEOFReturnFalse() {
 		this.So(scanner.Record(), should.BeNil)
 		this.So(scanner.Error(), should.BeNil)
 	}
+}
+
+func reader(lines []string) io.Reader {
+	return strings.NewReader(strings.Join(lines, "\n"))
 }
 
 var ( // https://golang.org/pkg/encoding/csv/#example_Reader
