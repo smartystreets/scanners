@@ -17,7 +17,7 @@ type ScanAllFixture struct {
 	*gunit.Fixture
 }
 
-func (this *ScanAllFixture) scanAll(inputs []string, options ...option) (scanned []Record) {
+func (this *ScanAllFixture) scanAll(inputs []string, options ...Option) (scanned []Record) {
 	reader := strings.NewReader(strings.Join(inputs, "\n"))
 	scanner := NewScanner(reader, options...)
 	line := 1
@@ -47,8 +47,15 @@ func (this *ScanAllFixture) TestCanonicalWithOptions() {
 	this.So(scanned, should.Resemble, expectedScannedOutput)
 }
 
+func (this *ScanAllFixture) TestOptions() {
+	scanner := NewScanner(nil, ReuseRecord(true), TrimLeadingSpace(true), LazyQuotes(true))
+	this.So(scanner.reader.ReuseRecord, should.BeTrue)
+	this.So(scanner.reader.LazyQuotes, should.BeTrue)
+	this.So(scanner.reader.TrimLeadingSpace, should.BeTrue)
+}
+
 func (this *ScanAllFixture) TestInconsistentFieldCounts_ContinueOnError() {
-	scanned := this.scanAll(csvCanonInconsistentFieldCounts, ContinueOnError)
+	scanned := this.scanAll(csvCanonInconsistentFieldCounts, ContinueOnError(true))
 	this.So(scanned, should.Resemble, []Record{
 		{line: 1, record: []string{"1", "2", "3"}, err: nil},
 		{line: 2, record: []string{"1", "2", "3", "4"}, err: &csv.ParseError{Line: 2, Column: 0, Err: csv.ErrFieldCount}},

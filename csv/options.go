@@ -1,45 +1,22 @@
 package csv
 
-// internal is used as an unexported placeholder type in the option func signature
-// thereby preventing users of this package from defining additional options. Hah!
-type internal struct{}
-
-// option is a func type received by NewScanner.
+// Option is a func type received by NewScanner.
 // Each one allows configuration of the scanner and/or its internal *csv.Reader.
-type option func(*Scanner, ...internal)
+type Option func(*Scanner)
 
-// Comma sets *csv.Reader.Comma. https://golang.org/pkg/encoding/csv/#Reader
-func Comma(comma rune) option {
-	return func(scanner *Scanner, _ ...internal) { scanner.reader.Comma = comma }
-}
-
-// Comment sets *csv.Reader.Comment. https://golang.org/pkg/encoding/csv/#Reader
-func Comment(comment rune) option {
-	return func(scanner *Scanner, _ ...internal) { scanner.reader.Comment = comment }
-}
-
-// FieldsPerRecord sets *csv.Reader.FieldsPerRecord: https://golang.org/pkg/encoding/csv/#Reader
-func FieldsPerRecord(fields int) option {
-	return func(scanner *Scanner, _ ...internal) { scanner.reader.FieldsPerRecord = fields }
-}
-
-// LazyQuotes sets *csv.Reader.LazyQuotes: https://golang.org/pkg/encoding/csv/#Reader
-func LazyQuotes(scanner *Scanner, _ ...internal) {
-	scanner.reader.LazyQuotes = true
-}
-
-// ReuseRecord sets *csv.Reader.ReuseRecord: https://golang.org/pkg/encoding/csv/#Reader
-func ReuseRecord(scanner *Scanner, _ ...internal) {
-	scanner.reader.ReuseRecord = true
-}
-
-// TrimLeadingSpace sets *csv.Reader.ReuseRecord: https://golang.org/pkg/encoding/csv/#Reader
-func TrimLeadingSpace(scanner *Scanner, _ ...internal) {
-	scanner.reader.TrimLeadingSpace = true
-}
-
-// ContinueOnError allows the scanner to continue past errors. See Scanner.Error() for
-// the exact error (before the next call to Scanner.Scan())
-func ContinueOnError(scanner *Scanner, _ ...internal) {
-	scanner.continueOnError = true
-}
+// ContinueOnError controls scanner behavior in error scenarios.
+// If true is passed, continue scanning until io.EOF is reached.
+// If false is passed (default), any error encountered during scanning
+// will result in the next call to Scan returning false and
+// the Scanner may be considered dead. See Scanner.Error() for the exact error
+// (before the next call to Scanner.Scan()).
+// See https://golang.org/pkg/encoding/csv/#pkg-variables
+// and https://golang.org/pkg/encoding/csv/#ParseError
+// for more information regarding possible error values.
+func ContinueOnError(continue_ bool) Option { return func(s *Scanner) { s.continueOnError = continue_ } }
+func Comma(comma rune) Option               { return func(s *Scanner) { s.reader.Comma = comma } }
+func Comment(comment rune) Option           { return func(s *Scanner) { s.reader.Comment = comment } }
+func FieldsPerRecord(fields int) Option     { return func(s *Scanner) { s.reader.FieldsPerRecord = fields } }
+func LazyQuotes(lazy bool) Option           { return func(s *Scanner) { s.reader.LazyQuotes = lazy } }
+func ReuseRecord(reuse bool) Option         { return func(s *Scanner) { s.reader.ReuseRecord = reuse } }
+func TrimLeadingSpace(trim bool) Option     { return func(s *Scanner) { s.reader.TrimLeadingSpace = trim } }

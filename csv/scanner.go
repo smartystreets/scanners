@@ -11,28 +11,18 @@ type Scanner struct {
 	record []string
 	err    error
 
-	// ContinueOnError controls scanner behavior in error scenarios.
-	// If true, continue scanning until io.EOF is reached.
-	// If false (default), any error encountered during scanning
-	// will result in the next call to Scan returning false and
-	// the Scanner may be considered dead.
-	// See https://golang.org/pkg/encoding/csv/#pkg-variables
-	// and https://golang.org/pkg/encoding/csv/#ParseError
-	// for more information regarding possible error values.
 	continueOnError bool
 }
 
 // NewScanner returns a scanner configured with the provided separator (comma).
-func NewScanner(reader io.Reader, options ...option) *Scanner {
+func NewScanner(reader io.Reader, options ...Option) *Scanner {
 	return new(Scanner).initialize(reader).configure(options)
 }
-
 func (this *Scanner) initialize(reader io.Reader) *Scanner {
 	this.reader = csv.NewReader(reader)
 	return this
 }
-
-func (this *Scanner) configure(options []option) *Scanner {
+func (this *Scanner) configure(options []Option) *Scanner {
 	for _, configure := range options {
 		configure(this)
 	}
