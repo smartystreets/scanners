@@ -14,7 +14,7 @@ type Scanner struct {
 	continueOnError bool
 }
 
-// NewScanner returns a scanner configured with the provided separator (comma).
+// NewScanner returns a scanner configured with the provided options.
 func NewScanner(reader io.Reader, options ...Option) *Scanner {
 	return new(Scanner).initialize(reader).configure(options)
 }
