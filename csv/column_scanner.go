@@ -1,6 +1,7 @@
 package csv
 
 import (
+	"fmt"
 	"io"
 	"log"
 )
@@ -35,10 +36,18 @@ func (this *ColumnScanner) Header() []string {
 	return this.headerRecord
 }
 
-func (this *ColumnScanner) Column(column string) string {
+func (this *ColumnScanner) ColumnErr(column string) (string, error) {
 	index, ok := this.columnIndex[column]
 	if !ok {
-		log.Panicf("Column [%s] not present in header record: %#v\n", column, this.headerRecord)
+		return "", fmt.Errorf("Column [%s] not present in header record: %#v\n", column, this.headerRecord)
 	}
-	return this.Record()[index]
+	return this.Record()[index], nil
+}
+
+func (this *ColumnScanner) Column(column string) string {
+	value, err := this.ColumnErr(column)
+	if err != nil {
+		log.Panic(err)
+	}
+	return value
 }
