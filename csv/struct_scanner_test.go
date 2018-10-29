@@ -47,3 +47,20 @@ type TaggedUser struct {
 	LastName  string `csv:"last_name"`
 	Username  string `csv:"username"`
 }
+
+func (this *StructScannerFixture) TestCannotReadHeader() {
+	scanner, err := NewStructScanner(new(ErrorReader))
+	this.So(scanner, should.BeNil)
+	this.So(err, should.NotBeNil)
+}
+
+func (this *StructScannerFixture) TestScanIntoLessCompatibleType() {
+	this.scanner.Scan()
+
+	var nonPointer User
+	this.So(this.scanner.Populate(nonPointer), should.NotBeNil)
+
+	var nilPointer *User
+	this.So(this.scanner.Populate(nilPointer), should.NotBeNil)
+}
+

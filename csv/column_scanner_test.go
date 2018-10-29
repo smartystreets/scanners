@@ -1,6 +1,7 @@
 package csv
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/smartystreets/assertions/should"
@@ -31,7 +32,7 @@ func (this *ColumnScannerFixture) ScanAllUsers() {
 	}
 }
 
-func (this *ColumnScannerFixture) Test() {
+func (this *ColumnScannerFixture) TestReadColumns() {
 	this.ScanAllUsers()
 
 	this.So(this.scanner.Error(), should.BeNil)
@@ -50,8 +51,33 @@ func (this *ColumnScannerFixture) scanUser() User {
 	}
 }
 
+func (this *ColumnScannerFixture) TestCannotReadHeader() {
+	scanner, err := NewColumnScanner(new(ErrorReader))
+	this.So(scanner, should.BeNil)
+	this.So(err, should.NotBeNil)
+}
+
+func (this *ColumnScannerFixture) TestColumnNotFound_Error() {
+	this.scanner.Scan()
+	value, err := this.scanner.ColumnErr("nope")
+	this.So(value, should.BeBlank)
+	this.So(err, should.NotBeNil)
+}
+
+func (this *ColumnScannerFixture) TestColumnNotFound_Panic() {
+	this.scanner.Scan()
+	this.So(func() { this.scanner.Column("nope") }, should.Panic)
+}
+
+
 type User struct {
 	FirstName string
 	LastName  string
 	Username  string
+}
+
+type ErrorReader struct {}
+
+func (this *ErrorReader) Read(p []byte) (n int, err error) {
+	return 0, errors.New("ERROR")
 }
