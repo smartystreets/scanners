@@ -43,12 +43,14 @@ func (this *StructScanner) populate(type_ reflect.Type, value reflect.Value) {
 		}
 
 		field := value.Field(x)
-		if field.Kind() != reflect.String {
-			continue // Future: return err?
-		} else if !field.CanSet() {
-			continue // Future: return err?
-		}
+		switch field.Kind() {
+		case reflect.String:
+			field.SetString(this.Column(column))
+		case reflect.Int:
+			if tempint, err := strconv.Atoi(this.Column(column)); err == nil {
+				field.SetInt(int64(tempint))
+			}
 
-		field.SetString(this.Column(column))
+		}
 	}
 }
