@@ -5,6 +5,8 @@ import (
 	"io"
 )
 
+var NewWriter = csv.NewWriter
+
 // Scanner wraps a csv.Reader via an API similar to that of bufio.Scanner.
 type Scanner struct {
 	reader *csv.Reader
