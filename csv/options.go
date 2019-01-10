@@ -20,3 +20,11 @@ func FieldsPerRecord(fields int) Option     { return func(s *Scanner) { s.reader
 func LazyQuotes(lazy bool) Option           { return func(s *Scanner) { s.reader.LazyQuotes = lazy } }
 func ReuseRecord(reuse bool) Option         { return func(s *Scanner) { s.reader.ReuseRecord = reuse } }
 func TrimLeadingSpace(trim bool) Option     { return func(s *Scanner) { s.reader.TrimLeadingSpace = trim } }
+func SkipHeaderRecord() Option              { return SkipRecords(1) }
+func SkipRecords(count int) Option {
+	return func(s *Scanner) {
+		for x := 0; x < count; x++ {
+			s.Scan()
+		}
+	}
+}

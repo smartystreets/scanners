@@ -85,6 +85,22 @@ func (this *ScanAllFixture) TestCallsToScanAfterEOFReturnFalse() {
 	}
 }
 
+func (this *ScanAllFixture) TestSkipHeader() {
+	scanned := this.scanAll(csvCanon, Comma(','), SkipHeaderRecord())
+	this.So(scanned, should.Resemble, []Record{
+		{line: 1, record: []string{"Rob", "Pike", "rob"}},
+		{line: 2, record: []string{"Ken", "Thompson", "ken"}},
+		{line: 3, record: []string{"Robert", "Griesemer", "gri"}},
+	})
+}
+
+func (this *ScanAllFixture) TestRecords() {
+	scanned := this.scanAll(csvCanon, Comma(','), SkipRecords(3))
+	this.So(scanned, should.Resemble, []Record{
+		{line: 1, record: []string{"Robert", "Griesemer", "gri"}},
+	})
+}
+
 func reader(lines []string) io.Reader {
 	return strings.NewReader(strings.Join(lines, "\n"))
 }
