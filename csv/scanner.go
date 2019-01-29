@@ -5,12 +5,6 @@ import (
 	"io"
 )
 
-type Writer = csv.Writer
-
-func NewWriter(w io.Writer) *Writer {
-	return csv.NewWriter(w)
-}
-
 // Scanner wraps a csv.Reader via an API similar to that of bufio.Scanner.
 type Scanner struct {
 	reader *csv.Reader
