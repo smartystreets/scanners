@@ -12,24 +12,41 @@ type ColumnScanner struct {
 	columnIndex  map[string]int
 }
 
+// NewColumnScannerWithoutHeader initializes a scanner using the provided reader and options
+// and uses the provided header to build a column index such that columns in each record can
+// be fetched using the Column* methods. It requires that all records in the data have the
+// same column count as the provided header.
+func NewColumnScannerWithoutHeader(reader io.Reader, header []string, options ...Option) *ColumnScanner {
+	return &ColumnScanner{
+		Scanner:      NewScanner(reader, append(options, FieldsPerRecord(len(header)))...),
+		headerRecord: header,
+		columnIndex:  deriveColumnIndices(header),
+	}
+}
+
+// NewColumnScanner initializes a scanner using the provided reader and options which reads and
+// analyzes the first record (as a header) such that specific columns can be fetched using the
+// Column* methods. It returns an error if the header record cannot be read. It assumes that
+// all records in the data have the same column count as the first/header record.
 func NewColumnScanner(reader io.Reader, options ...Option) (*ColumnScanner, error) {
 	inner := NewScanner(reader, append(options, FieldsPerRecord(0))...)
 	if !inner.Scan() {
 		return nil, inner.Error()
 	}
-	scanner := &ColumnScanner{
+	header := inner.Record()
+	return &ColumnScanner{
 		Scanner:      inner,
-		headerRecord: inner.Record(),
-		columnIndex:  make(map[string]int),
-	}
-	scanner.readHeader()
-	return scanner, nil
+		headerRecord: header,
+		columnIndex:  deriveColumnIndices(header),
+	}, nil
 }
 
-func (this *ColumnScanner) readHeader() {
-	for i, value := range this.headerRecord {
-		this.columnIndex[value] = i
+func deriveColumnIndices(header []string) map[string]int {
+	index := make(map[string]int)
+	for i, value := range header {
+		index[value] = i
 	}
+	return index
 }
 
 func (this *ColumnScanner) Header() []string {

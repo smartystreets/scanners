@@ -69,6 +69,20 @@ func (this *ColumnScannerFixture) TestColumnNotFound_Panic() {
 	this.So(func() { this.scanner.Column("nope") }, should.Panic)
 }
 
+func (this *ColumnScannerFixture) TestReadColumnsFromInjectedHeader() {
+	this.scanner = NewColumnScannerWithoutHeader(
+		reader(csvCanonWithoutHeader),
+		[]string{"first_name", "last_name", "username"},
+	)
+	this.ScanAllUsers()
+
+	this.So(this.scanner.Error(), should.BeNil)
+	this.So(this.users, should.Resemble, []User{
+		{FirstName: "Rob", LastName: "Pike", Username: "rob"},
+		{FirstName: "Ken", LastName: "Thompson", Username: "ken"},
+		{FirstName: "Robert", LastName: "Griesemer", Username: "gri"},
+	})
+}
 
 type User struct {
 	FirstName string
@@ -76,7 +90,7 @@ type User struct {
 	Username  string
 }
 
-type ErrorReader struct {}
+type ErrorReader struct{}
 
 func (this *ErrorReader) Read(p []byte) (n int, err error) {
 	return 0, errors.New("ERROR")

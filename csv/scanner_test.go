@@ -130,6 +130,7 @@ var ( // https://golang.org/pkg/encoding/csv/#example_Reader
 		{3, []string{"Ken", "Thompson", "ken"}, nil},
 		{4, []string{"Robert", "Griesemer", "gri"}, nil},
 	}
+	csvCanonWithoutHeader = csvCanon[1:]
 )
 
 type Record struct {
