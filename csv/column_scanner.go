@@ -8,7 +8,7 @@ import (
 
 type ColumnScanner struct {
 	*Scanner
-	headerRecord []string
+	HeaderRecord []string
 	columnIndex  map[string]int
 }
 
@@ -19,7 +19,7 @@ func NewColumnScanner(reader io.Reader, options ...Option) (*ColumnScanner, erro
 	}
 	scanner := &ColumnScanner{
 		Scanner:      inner,
-		headerRecord: inner.Record(),
+		HeaderRecord: inner.Record(),
 		columnIndex:  make(map[string]int),
 	}
 	scanner.readHeader()
@@ -27,19 +27,19 @@ func NewColumnScanner(reader io.Reader, options ...Option) (*ColumnScanner, erro
 }
 
 func (this *ColumnScanner) readHeader() {
-	for i, value := range this.headerRecord {
+	for i, value := range this.HeaderRecord {
 		this.columnIndex[value] = i
 	}
 }
 
 func (this *ColumnScanner) Header() []string {
-	return this.headerRecord
+	return this.HeaderRecord
 }
 
 func (this *ColumnScanner) ColumnErr(column string) (string, error) {
 	index, ok := this.columnIndex[column]
 	if !ok {
-		return "", fmt.Errorf("Column [%s] not present in header record: %#v\n", column, this.headerRecord)
+		return "", fmt.Errorf("Column [%s] not present in header record: %#v\n", column, this.HeaderRecord)
 	}
 	return this.Record()[index], nil
 }
