@@ -63,4 +63,3 @@ func (this *StructScannerFixture) TestScanIntoLessCompatibleType() {
 	var nilPointer *User
 	this.So(this.scanner.Populate(nilPointer), should.NotBeNil)
 }
-

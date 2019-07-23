@@ -69,14 +69,13 @@ func (this *ColumnScannerFixture) TestColumnNotFound_Panic() {
 	this.So(func() { this.scanner.Column("nope") }, should.Panic)
 }
 
-
 type User struct {
 	FirstName string
 	LastName  string
 	Username  string
 }
 
-type ErrorReader struct {}
+type ErrorReader struct{}
 
 func (this *ErrorReader) Read(p []byte) (n int, err error) {
 	return 0, errors.New("ERROR")
