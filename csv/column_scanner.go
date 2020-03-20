@@ -13,7 +13,7 @@ type ColumnScanner struct {
 }
 
 func NewColumnScanner(reader io.Reader, options ...Option) (*ColumnScanner, error) {
-	inner := NewScanner(reader, append(options, FieldsPerRecord(0))...)
+	inner := NewScanner(reader, append(options, Options.FieldsPerRecord(0))...)
 	if !inner.Scan() {
 		return nil, inner.Error()
 	}

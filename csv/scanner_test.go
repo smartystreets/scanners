@@ -38,24 +38,24 @@ func (this *ScanAllFixture) scanAll(inputs []string, options ...Option) (scanned
 }
 
 func (this *ScanAllFixture) TestCanonical() {
-	scanned := this.scanAll(csvCanon, Comma(','), FieldsPerRecord(3))
+	scanned := this.scanAll(csvCanon, Options.Comma(','), Options.FieldsPerRecord(3))
 	this.So(scanned, should.Resemble, expectedScannedOutput)
 }
 
 func (this *ScanAllFixture) TestCanonicalWithOptions() {
-	scanned := this.scanAll(csvCanonRequiringConfigOptions, Comma(';'), Comment('#'))
+	scanned := this.scanAll(csvCanonRequiringConfigOptions, Options.Comma(';'), Options.Comment('#'))
 	this.So(scanned, should.Resemble, expectedScannedOutput)
 }
 
 func (this *ScanAllFixture) TestOptions() {
-	scanner := NewScanner(nil, ReuseRecord(true), TrimLeadingSpace(true), LazyQuotes(true))
+	scanner := NewScanner(nil, Options.ReuseRecord(true), Options.TrimLeadingSpace(true), Options.LazyQuotes(true))
 	this.So(scanner.reader.ReuseRecord, should.BeTrue)
 	this.So(scanner.reader.LazyQuotes, should.BeTrue)
 	this.So(scanner.reader.TrimLeadingSpace, should.BeTrue)
 }
 
 func (this *ScanAllFixture) TestInconsistentFieldCounts_ContinueOnError() {
-	scanned := this.scanAll(csvCanonInconsistentFieldCounts, ContinueOnError(true))
+	scanned := this.scanAll(csvCanonInconsistentFieldCounts, Options.ContinueOnError(true))
 	this.So(scanned, should.Resemble, []Record{
 		{line: 1, record: []string{"1", "2", "3"}, err: nil},
 		{line: 2, record: []string{"1", "2", "3", "4"}, err: &csv.ParseError{StartLine: 2, Line: 2, Column: 0, Err: csv.ErrFieldCount}},
@@ -72,7 +72,7 @@ func (this *ScanAllFixture) TestInconsistentFieldCounts_HaltOnError() {
 }
 
 func (this *ScanAllFixture) TestCallsToScanAfterEOFReturnFalse() {
-	scanner := NewScanner(strings.NewReader("1,2,3"), Comma(','))
+	scanner := NewScanner(strings.NewReader("1,2,3"), Options.Comma(','))
 
 	this.So(scanner.Scan(), should.BeTrue)
 	this.So(scanner.Record(), should.Resemble, []string{"1", "2", "3"})
@@ -86,7 +86,7 @@ func (this *ScanAllFixture) TestCallsToScanAfterEOFReturnFalse() {
 }
 
 func (this *ScanAllFixture) TestSkipHeader() {
-	scanned := this.scanAll(csvCanon, Comma(','), SkipHeaderRecord())
+	scanned := this.scanAll(csvCanon, Options.Comma(','), Options.SkipHeaderRecord())
 	this.So(scanned, should.Resemble, []Record{
 		{line: 1, record: []string{"Rob", "Pike", "rob"}},
 		{line: 2, record: []string{"Ken", "Thompson", "ken"}},
@@ -95,7 +95,7 @@ func (this *ScanAllFixture) TestSkipHeader() {
 }
 
 func (this *ScanAllFixture) TestRecords() {
-	scanned := this.scanAll(csvCanon, Comma(','), SkipRecords(3))
+	scanned := this.scanAll(csvCanon, Options.Comma(','), Options.SkipRecords(3))
 	this.So(scanned, should.Resemble, []Record{
 		{line: 1, record: []string{"Robert", "Griesemer", "gri"}},
 	})

@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/smartystreets/scanners/csv"
+	"github.com/smartystreets/scanners/v2/csv"
 )
 
 func ExampleScanner() {
@@ -43,7 +43,7 @@ func ExampleScanner_options() {
 		`"Robert";"Griesemer";"gri"`,
 	}, "\n")
 
-	scanner := csv.NewScanner(strings.NewReader(in), csv.Comma(';'), csv.Comment('#'))
+	scanner := csv.NewScanner(strings.NewReader(in), csv.Options.Comma(';'), csv.Options.Comment('#'))
 
 	for scanner.Scan() {
 		fmt.Println(scanner.Record())

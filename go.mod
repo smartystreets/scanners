@@ -1,4 +1,4 @@
-module github.com/smartystreets/scanners
+module github.com/smartystreets/scanners/v2
 
 go 1.13
 
