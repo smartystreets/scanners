@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 test:
-	go test -timeout=1s -race -covermode=atomic .
+	go test -timeout=1s -race -covermode=atomic -count=1 ./...
 
 compile:
 	go build ./...
