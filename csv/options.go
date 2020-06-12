@@ -13,14 +13,18 @@ type Option func(*Scanner)
 // See https://golang.org/pkg/encoding/csv/#pkg-variables
 // and https://golang.org/pkg/encoding/csv/#ParseError
 // for more information regarding possible error values.
-func ContinueOnError(continue_ bool) Option { return func(s *Scanner) { s.continueOnError = continue_ } }
-func Comma(comma rune) Option               { return func(s *Scanner) { s.reader.Comma = comma } }
-func Comment(comment rune) Option           { return func(s *Scanner) { s.reader.Comment = comment } }
-func FieldsPerRecord(fields int) Option     { return func(s *Scanner) { s.reader.FieldsPerRecord = fields } }
-func LazyQuotes(lazy bool) Option           { return func(s *Scanner) { s.reader.LazyQuotes = lazy } }
-func ReuseRecord(reuse bool) Option         { return func(s *Scanner) { s.reader.ReuseRecord = reuse } }
-func TrimLeadingSpace(trim bool) Option     { return func(s *Scanner) { s.reader.TrimLeadingSpace = trim } }
-func SkipHeaderRecord() Option              { return SkipRecords(1) }
+func ContinueOnError(continue_ bool) Option {
+	return func(s *Scanner) { s.continueOnError = continue_ }
+}
+func Comma(comma rune) Option     { return func(s *Scanner) { s.reader.Comma = comma } }
+func Comment(comment rune) Option { return func(s *Scanner) { s.reader.Comment = comment } }
+func FieldsPerRecord(fields int) Option {
+	return func(s *Scanner) { s.reader.FieldsPerRecord = fields }
+}
+func LazyQuotes(lazy bool) Option       { return func(s *Scanner) { s.reader.LazyQuotes = lazy } }
+func ReuseRecord(reuse bool) Option     { return func(s *Scanner) { s.reader.ReuseRecord = reuse } }
+func TrimLeadingSpace(trim bool) Option { return func(s *Scanner) { s.reader.TrimLeadingSpace = trim } }
+func SkipHeaderRecord() Option          { return SkipRecords(1) }
 func SkipRecords(count int) Option {
 	return func(s *Scanner) {
 		for x := 0; x < count; x++ {

@@ -11,4 +11,4 @@ compile:
 
 build: test compile
 
-.PHONY: test compile build
+.PHONY: test fmt compile build
