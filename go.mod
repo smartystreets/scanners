@@ -1,6 +1,6 @@
 module github.com/smartystreets/scanners
 
-go 1.13
+go 1.17
 
 require (
 	github.com/smartystreets/assertions v1.2.0
