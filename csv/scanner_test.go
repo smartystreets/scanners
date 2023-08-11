@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/smartystreets/assertions/should"
-	"github.com/smartystreets/gunit"
+	"github.com/smarty/assertions/should"
+	"github.com/smarty/gunit"
 )
 
 func TestScanAllFixture(t *testing.T) {
@@ -58,7 +58,7 @@ func (this *ScanAllFixture) TestInconsistentFieldCounts_ContinueOnError() {
 	scanned := this.scanAll(csvCanonInconsistentFieldCounts, ContinueOnError(true))
 	this.So(scanned, should.Resemble, []Record{
 		{line: 1, record: []string{"1", "2", "3"}, err: nil},
-		{line: 2, record: []string{"1", "2", "3", "4"}, err: &csv.ParseError{StartLine: 2, Line: 2, Column: 0, Err: csv.ErrFieldCount}},
+		{line: 2, record: []string{"1", "2", "3", "4"}, err: &csv.ParseError{StartLine: 2, Line: 2, Column: 1, Err: csv.ErrFieldCount}},
 		{line: 3, record: []string{"1", "2", "3"}, err: nil},
 	})
 }
@@ -67,7 +67,7 @@ func (this *ScanAllFixture) TestInconsistentFieldCounts_HaltOnError() {
 	scanned := this.scanAll(csvCanonInconsistentFieldCounts)
 	this.So(scanned, should.Resemble, []Record{
 		{line: 1, record: []string{"1", "2", "3"}, err: nil},
-		{line: 2, record: nil, err: &csv.ParseError{StartLine: 2, Line: 2, Column: 0, Err: csv.ErrFieldCount}},
+		{line: 2, record: nil, err: &csv.ParseError{StartLine: 2, Line: 2, Column: 1, Err: csv.ErrFieldCount}},
 	})
 }
 
